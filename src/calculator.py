@@ -73,8 +73,12 @@ class Calculator:
 	def set_operation(self, operation: str) -> None:
 		self._operation = _OP_FUNC_MAP[operation]
 
-	def store_operand(self) -> None:
-		self._prev_num = self.curr_num
+	def store_operand(self, value: Optional[int] = None) -> None:
+		if value is None:
+			value = self.curr_num
+
+		self._prev_num = value
+		self.curr_num = None
 
 	def store_result(self) -> None:
 		self._prev_num = self.get_result()

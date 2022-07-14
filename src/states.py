@@ -30,13 +30,8 @@ class InitialState(BaseState):
 		if op == '=':
 			return self
 
-		self.ctx.curr_num = 0
-
-		self.ctx.store_operand()
-		self.ctx.curr_num = None
-
+		self.ctx.store_operand(0)
 		self.ctx.set_operation(op)
-
 		return TypingOperator(self.ctx)
 
 	def get_display(self) -> int:
@@ -50,7 +45,6 @@ class TypingFirstNumber(BaseState):
 
 	def handle_operator(self, op: str) -> IState:
 		self.ctx.store_operand()
-		self.ctx.curr_num = None
 		self.ctx.set_operation(op)
 		return TypingOperator(self.ctx)
 
