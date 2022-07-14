@@ -49,7 +49,7 @@ class RefactorState(BaseState):
 				next_state = InitialState(self.ctx)
 
 		self.ctx.curr_num = None
-		self.ctx.operation = operation
+		self.ctx.set_operation(operation)
 
 		return next_state
 

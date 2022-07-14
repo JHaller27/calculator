@@ -32,7 +32,7 @@ class Calculator:
 	result: Optional[int]
 	prev_num: Optional[int]
 	curr_num: Optional[int]
-	operation: Optional[str]
+	_operation: Optional[OpFuncType]
 	_state: states.IState
 
 	def __init__(self, precision: int = 3) -> None:
@@ -66,17 +66,19 @@ class Calculator:
 			self.curr_num = 0
 		self.curr_num = self.curr_num * 10 + (digit * self._factor)
 
+	def set_operation(self, operation: str) -> None:
+		self._operation = _OP_FUNC_MAP[operation]
+
 	def get_result(self) -> int:
-		assert self.operation is not None and self.prev_num is not None and self.curr_num is not None
-		op_func = _OP_FUNC_MAP[self.operation]
-		result = op_func(self.prev_num, self.curr_num, self._factor)
+		assert self._operation is not None and self.prev_num is not None and self.curr_num is not None
+		result = self._operation(self.prev_num, self.curr_num, self._factor)
 		return result
 
 	def reset(self) -> None:
 		self.result = None
 		self.prev_num = None
 		self.curr_num = None
-		self.operation = None
+		self._operation = None
 
 	def press_button(self, button: str) -> None:
 		if button.upper() == 'AC':
