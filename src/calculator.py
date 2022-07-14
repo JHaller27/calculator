@@ -8,11 +8,14 @@ OpFuncType = Callable[[int, int, int], int]
 def _add(x: int, y: int, factor: int) -> int:
 	return x + y
 
+
 def _sub(x: int, y: int, factor: int) -> int:
 	return x - y
 
+
 def _mult( x: int, y: int, factor: int) -> int:
 	return (x * y) // factor
+
 
 def _div(x: int, y: int, factor: int) -> int:
 	q, r =  divmod(x, y)
@@ -29,7 +32,7 @@ _OP_FUNC_MAP: dict[str, OpFuncType] = {
 
 
 class Calculator:
-	prev_num: Optional[int]
+	_prev_num: Optional[int]
 	curr_num: Optional[int]
 	_operation: Optional[OpFuncType]
 	_state: states.IState
@@ -44,6 +47,10 @@ class Calculator:
 	@property
 	def factor(self) -> int:
 		return self._factor
+
+	@property
+	def prev_num(self) -> int:
+		return self._prev_num
 
 	def i2s(self, num: int) -> str:
 		whole_part, decimal_part = divmod(num, self.factor)
@@ -67,21 +74,21 @@ class Calculator:
 		self._operation = _OP_FUNC_MAP[operation]
 
 	def store_operand(self) -> None:
-		self.prev_num = self.curr_num
+		self._prev_num = self.curr_num
 
 	def store_result(self) -> None:
-		self.prev_num = self.get_result()
+		self._prev_num = self.get_result()
 
 	def get_result(self) -> int:
 		assert self._operation is not None
-		assert self.prev_num is not None
+		assert self._prev_num is not None
 		assert self.curr_num is not None
 
-		result = self._operation(self.prev_num, self.curr_num, self._factor)
+		result = self._operation(self._prev_num, self.curr_num, self._factor)
 		return result
 
 	def reset(self) -> None:
-		self.prev_num = None
+		self._prev_num = None
 		self.curr_num = None
 		self._operation = None
 		self._state = states.InitialState(self)
