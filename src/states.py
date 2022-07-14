@@ -28,18 +28,15 @@ class BaseState(IState):
 
 class RefactorState(BaseState):
 	def handle_digit(self, digit: int) -> IState:
-		if self.ctx.result is not None:
-			self.ctx.reset()
-
-		self.ctx.append_digit(digit)
-
-		return self
+		raise NotImplementedError
 
 	def handle_operator(self, operation: str) -> IState:
 		if operation == '=':
 			self.ctx.result = self.ctx.get_result()
 			self.ctx.prev_num = self.ctx.result
-			return self
+			return HasResultState(self.ctx)
+
+		next_state = self
 
 		if self.ctx.prev_num is None:
 			self.ctx.prev_num = self.ctx.curr_num
@@ -49,16 +46,32 @@ class RefactorState(BaseState):
 				self.ctx.prev_num = self.ctx.get_result()
 			else:
 				self.ctx.result = None
+				next_state = InitialState(self.ctx)
 
 		self.ctx.curr_num = None
 		self.ctx.operation = operation
 
-		return self
+		return next_state
 
 	def get_display(self) -> str:
-		num: int = coalesce(self.ctx.result, self.ctx.curr_num, self.ctx.prev_num, 0)
-		return self.ctx.i2s(num)
+		raise NotImplementedError
 
 
 class InitialState(RefactorState):
-	pass
+	def handle_digit(self, digit: int) -> IState:
+		self.ctx.append_digit(digit)
+		return self
+
+	def get_display(self) -> str:
+		num: int = coalesce(self.ctx.curr_num, self.ctx.prev_num, 0)
+		return self.ctx.i2s(num)
+
+
+class HasResultState(RefactorState):
+	def handle_digit(self, digit: int) -> IState:
+		self.ctx.reset()
+		self.ctx.append_digit(digit)
+		return InitialState(self.ctx)
+
+	def get_display(self) -> str:
+		return self.ctx.i2s(self.ctx.result)
