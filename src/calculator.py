@@ -18,7 +18,7 @@ def _mult( x: int, y: int, factor: int) -> int:
 
 
 def _div(x: int, y: int, factor: int) -> int:
-	q, r =  divmod(x, y)
+	q, r = divmod(x, y)
 	decimal = round(r * 10 // (y // factor), -1) // 10  # r*10 then //10 to get next digit, to use for rounding
 	return q * factor + decimal
 
