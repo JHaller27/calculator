@@ -8,6 +8,12 @@ def coalesce(*args):
 			return a
 
 
+def i2s(num: int, precision_factor: int) -> str:
+	whole_part, decimal_part = divmod(num, precision_factor)
+	out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
+	return out_str
+
+
 class BaseState(IState):
 	def __init__(self, ctx: Calculator):
 		self._ctx = ctx
@@ -57,7 +63,4 @@ class InitialState(BaseState):
 
 	def get_display(self) -> str:
 		num: int = coalesce(self.ctx.result, self.ctx.curr_num, self.ctx.prev_num, 0)
-
-		whole_part, decimal_part = divmod(num, self.ctx.factor)
-		out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
-		return out_str
+		return i2s(num, self.ctx.factor)
