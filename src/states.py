@@ -26,7 +26,7 @@ class BaseState(IState):
 		raise NotImplementedError
 
 
-class RefactorState(BaseState):
+class InitialState(BaseState):
 	def handle_digit(self, digit: int) -> IState:
 		if self.ctx.result is not None:
 			self.ctx.reset()
