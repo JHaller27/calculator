@@ -2,12 +2,6 @@ from istate import IState
 from calculator import Calculator
 
 
-def coalesce(*args):
-	for a in args:
-		if a is not None:
-			return a
-
-
 class BaseState(IState):
 	def __init__(self, ctx: Calculator):
 		self._ctx = ctx
