@@ -38,7 +38,7 @@ class Calculator:
 	def __init__(self, precision: int = 3) -> None:
 		self._precision = precision
 		self._factor = 10**self._precision
-		self._state = states.InitialState(self)
+		self._state = states.RefactorState(self)
 
 		self.reset()
 
