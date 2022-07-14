@@ -1,4 +1,5 @@
 from typing import Callable, Optional
+import states
 
 
 def coalesce(*args):
@@ -34,19 +35,21 @@ _OP_FUNC_MAP: dict[str, OpFuncType] = {
 
 
 class Calculator:
-	_result: Optional[int]
-	_prev_num: Optional[int]
-	_curr_num: Optional[int]
-	_operation: Optional[str]
+	result: Optional[int]
+	prev_num: Optional[int]
+	curr_num: Optional[int]
+	operation: Optional[str]
+	_state: states.IState
 
 	def __init__(self, precision: int = 3) -> None:
 		self._precision = precision
 		self._factor = 10**self._precision
+		self._state = states.RefactorState(self)
 
-		self._reset()
+		self.reset()
 
 	def get_display(self) -> str:
-		num: int = coalesce(self._result, self._curr_num, self._prev_num, 0)
+		num: int = coalesce(self.result, self.curr_num, self.prev_num, 0)
 
 		whole_part, decimal_part = divmod(num, self._factor)
 		out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
@@ -56,47 +59,32 @@ class Calculator:
 		num = int(digit)
 		assert len(digit) == 1
 
-		if self._result is not None:
-			self._reset()
+		if self.result is not None:
+			self.reset()
 
-		if self._curr_num is None:
-			self._curr_num = 0
+		if self.curr_num is None:
+			self.curr_num = 0
 
-		self._curr_num = self._curr_num * 10 + (num * self._factor)
+		self.curr_num = self.curr_num * 10 + (num * self._factor)
 
 	def _press_operation(self, operation: str) -> None:
-		if self._prev_num is None:
-			self._prev_num = self._curr_num
+		self._state = self._state.handle_operator(operation)
 
-		elif self._curr_num is not None:
-			if self._result is None:
-				self._prev_num = self._get_result()
-			else:
-				self._result = None
-
-		self._curr_num = None
-		self._operation = operation
-
-	def _get_result(self) -> int:
-		assert self._operation is not None and self._prev_num is not None and self._curr_num is not None
-		op_func = _OP_FUNC_MAP[self._operation]
-		result = op_func(self._prev_num, self._curr_num, self._factor)
+	def get_result(self) -> int:
+		assert self.operation is not None and self.prev_num is not None and self.curr_num is not None
+		op_func = _OP_FUNC_MAP[self.operation]
+		result = op_func(self.prev_num, self.curr_num, self._factor)
 		return result
 
-	def _reset(self) -> None:
-		self._result = None
-		self._prev_num = None
-		self._curr_num = None
-		self._operation = None
+	def reset(self) -> None:
+		self.result = None
+		self.prev_num = None
+		self.curr_num = None
+		self.operation = None
 
 	def press_button(self, button: str) -> None:
 		if button.upper() == 'AC':
-			self._reset()
-			return
-
-		if button == '=':
-			self._result = self._get_result()
-			self._prev_num = self._result
+			self.reset()
 			return
 
 		try:
