@@ -29,7 +29,6 @@ _OP_FUNC_MAP: dict[str, OpFuncType] = {
 
 
 class Calculator:
-	result: Optional[int]
 	prev_num: Optional[int]
 	curr_num: Optional[int]
 	_operation: Optional[OpFuncType]
@@ -62,23 +61,30 @@ class Calculator:
 		self._state = self._state.handle_operator(operation)
 
 	def append_digit(self, digit: int) -> None:
-		if self.curr_num is None:
-			self.curr_num = 0
 		self.curr_num = self.curr_num * 10 + (digit * self._factor)
 
 	def set_operation(self, operation: str) -> None:
 		self._operation = _OP_FUNC_MAP[operation]
 
+	def store_operand(self) -> None:
+		self.prev_num = self.curr_num
+
+	def store_result(self) -> None:
+		self.prev_num = self.get_result()
+
 	def get_result(self) -> int:
-		assert self._operation is not None and self.prev_num is not None and self.curr_num is not None
+		assert self._operation is not None
+		assert self.prev_num is not None
+		assert self.curr_num is not None
+
 		result = self._operation(self.prev_num, self.curr_num, self._factor)
 		return result
 
 	def reset(self) -> None:
-		self.result = None
 		self.prev_num = None
 		self.curr_num = None
 		self._operation = None
+		self._state = states.InitialState(self)
 
 	def press_button(self, button: str) -> None:
 		if button.upper() == 'AC':
@@ -93,8 +99,9 @@ class Calculator:
 
 if __name__ == '__main__':
 	calc = Calculator()
-	n = int(input())
-	for _ in range(n):
-		raw = input()
+	# n = int(input())
+	# for _ in range(n):
+	for raw in '2+1==+6=':
+		# raw = input()
 		calc.press_button(raw)
 		print(calc.get_display())

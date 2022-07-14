@@ -26,52 +26,93 @@ class BaseState(IState):
 		raise NotImplementedError
 
 
-class RefactorState(BaseState):
+class InitialState(BaseState):
 	def handle_digit(self, digit: int) -> IState:
-		raise NotImplementedError
+		self.ctx.curr_num = 0
+		self.ctx.append_digit(digit)
+		return TypingFirstNumber(self.ctx)
 
-	def handle_operator(self, operation: str) -> IState:
-		if operation == '=':
-			self.ctx.result = self.ctx.get_result()
-			self.ctx.prev_num = self.ctx.result
-			return HasResultState(self.ctx)
+	def handle_operator(self, op: str) -> IState:
+		if op == '=':
+			return self
 
-		next_state = self
+		self.ctx.curr_num = 0
 
-		if self.ctx.prev_num is None:
-			self.ctx.prev_num = self.ctx.curr_num
-
-		elif self.ctx.curr_num is not None:
-			if self.ctx.result is None:
-				self.ctx.prev_num = self.ctx.get_result()
-			else:
-				self.ctx.result = None
-				next_state = InitialState(self.ctx)
-
+		self.ctx.store_operand()
 		self.ctx.curr_num = None
-		self.ctx.set_operation(operation)
 
-		return next_state
+		self.ctx.set_operation(op)
+
+		return TypingOperator(self.ctx)
 
 	def get_display(self) -> str:
-		raise NotImplementedError
+		return "0"
 
 
-class InitialState(RefactorState):
+class TypingFirstNumber(BaseState):
 	def handle_digit(self, digit: int) -> IState:
 		self.ctx.append_digit(digit)
 		return self
 
+	def handle_operator(self, op: str) -> IState:
+		self.ctx.store_operand()
+		self.ctx.curr_num = None
+		self.ctx.set_operation(op)
+		return TypingOperator(self.ctx)
+
 	def get_display(self) -> str:
-		num: int = coalesce(self.ctx.curr_num, self.ctx.prev_num, 0)
-		return self.ctx.i2s(num)
+		return self.ctx.i2s(self.ctx.curr_num)
 
 
-class HasResultState(RefactorState):
+class TypingOperator(BaseState):
+	def handle_digit(self, digit: int) -> IState:
+		self.ctx.curr_num = 0
+		self.ctx.append_digit(digit)
+		return TypingSecondNumber(self.ctx)
+
+	def handle_operator(self, op: str) -> IState:
+		self.ctx.set_operation(op)
+		return self
+
+	def get_display(self) -> str:
+		return self.ctx.i2s(self.ctx.prev_num)
+
+
+class TypingSecondNumber(BaseState):
+	def handle_digit(self, digit: int) -> IState:
+		self.ctx.append_digit(digit)
+		return self
+
+	def handle_operator(self, op: str) -> IState:
+		self.ctx.store_result()
+		if op == '=':
+			return HasResultState(self.ctx)
+
+		self.ctx.curr_num = None
+		self.ctx.set_operation(op)
+		return TypingOperator(self.ctx)
+
+	def get_display(self) -> str:
+		return self.ctx.i2s(self.ctx.curr_num)
+
+
+class HasResultState(BaseState):
 	def handle_digit(self, digit: int) -> IState:
 		self.ctx.reset()
+
+		self.ctx.curr_num = 0
 		self.ctx.append_digit(digit)
-		return InitialState(self.ctx)
+
+		return TypingFirstNumber(self.ctx)
+
+	def handle_operator(self, op: str) -> IState:
+		if op == '=':
+			self.ctx.store_result()
+			return self
+
+		self.ctx.curr_num = None
+		self.ctx.set_operation(op)
+		return TypingOperator(self.ctx)
 
 	def get_display(self) -> str:
-		return self.ctx.i2s(self.ctx.result)
+		return self.ctx.i2s(self.ctx.prev_num)
