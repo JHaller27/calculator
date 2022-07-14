@@ -46,6 +46,11 @@ class Calculator:
 	def factor(self) -> int:
 		return self._factor
 
+	def i2s(self, num: int) -> str:
+		whole_part, decimal_part = divmod(num, self.factor)
+		out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
+		return out_str
+
 	def get_display(self) -> str:
 		return self._state.get_display()
 
