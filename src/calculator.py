@@ -56,19 +56,16 @@ class Calculator:
 		return out_str
 
 	def _press_digit(self, digit: str) -> None:
-		num = int(digit)
-		assert len(digit) == 1
-
-		if self.result is not None:
-			self.reset()
-
-		if self.curr_num is None:
-			self.curr_num = 0
-
-		self.curr_num = self.curr_num * 10 + (num * self._factor)
+		digit = int(digit)
+		self._state = self._state.handle_digit(digit)
 
 	def _press_operation(self, operation: str) -> None:
 		self._state = self._state.handle_operator(operation)
+
+	def append_digit(self, digit: int) -> None:
+		if self.curr_num is None:
+			self.curr_num = 0
+		self.curr_num = self.curr_num * 10 + (digit * self._factor)
 
 	def get_result(self) -> int:
 		assert self.operation is not None and self.prev_num is not None and self.curr_num is not None

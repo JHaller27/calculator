@@ -22,7 +22,12 @@ class BaseState(IState):
 
 class RefactorState(BaseState):
 	def handle_digit(self, digit: int) -> IState:
-		raise NotImplementedError
+		if self.ctx.result is not None:
+			self.ctx.reset()
+
+		self.ctx.append_digit(digit)
+
+		return self
 
 	def handle_operator(self, operation: str) -> IState:
 		if operation == '=':
