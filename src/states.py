@@ -2,6 +2,12 @@ from istate import IState
 from calculator import Calculator
 
 
+def coalesce(*args):
+	for a in args:
+		if a is not None:
+			return a
+
+
 class BaseState(IState):
 	def __init__(self, ctx: Calculator):
 		self._ctx = ctx
@@ -50,4 +56,8 @@ class RefactorState(BaseState):
 		return self
 
 	def get_display(self) -> str:
-		raise NotImplementedError
+		num: int = coalesce(self.ctx.result, self.ctx.curr_num, self.ctx.prev_num, 0)
+
+		whole_part, decimal_part = divmod(num, self.ctx.factor)
+		out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
+		return out_str

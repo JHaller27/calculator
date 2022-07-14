@@ -2,12 +2,6 @@ from typing import Callable, Optional
 import states
 
 
-def coalesce(*args):
-	for a in args:
-		if a is not None:
-			return a
-
-
 OpFuncType = Callable[[int, int, int], int]
 
 
@@ -48,12 +42,12 @@ class Calculator:
 
 		self.reset()
 
-	def get_display(self) -> str:
-		num: int = coalesce(self.result, self.curr_num, self.prev_num, 0)
+	@property
+	def factor(self) -> int:
+		return self._factor
 
-		whole_part, decimal_part = divmod(num, self._factor)
-		out_str = f'{whole_part}.{decimal_part}'.rstrip('0').rstrip('.')
-		return out_str
+	def get_display(self) -> str:
+		return self._state.get_display()
 
 	def _press_digit(self, digit: str) -> None:
 		digit = int(digit)
