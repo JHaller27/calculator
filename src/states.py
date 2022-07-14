@@ -64,3 +64,7 @@ class RefactorState(BaseState):
 	def get_display(self) -> str:
 		num: int = coalesce(self.ctx.result, self.ctx.curr_num, self.ctx.prev_num, 0)
 		return i2s(num, self.ctx.factor)
+
+
+class InitialState(RefactorState):
+	pass
