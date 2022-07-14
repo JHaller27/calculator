@@ -53,8 +53,7 @@ class Calculator:
 	def get_display(self) -> str:
 		return self._state.get_display()
 
-	def _press_digit(self, digit: str) -> None:
-		digit = int(digit)
+	def _press_digit(self, digit: int) -> None:
 		self._state = self._state.handle_digit(digit)
 
 	def _press_operation(self, operation: str) -> None:
@@ -91,10 +90,12 @@ class Calculator:
 			self.reset()
 			return
 
-		try:
-			self._press_digit(button)
-		except ValueError:
-			self._press_operation(button)
+		if button.isnumeric():
+			digit = int(button)
+			self._press_digit(digit)
+			return
+
+		self._press_operation(button)
 
 
 if __name__ == '__main__':
