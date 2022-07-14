@@ -51,7 +51,8 @@ class Calculator:
 		return out_str
 
 	def get_display(self) -> str:
-		return self._state.get_display()
+		num = self._state.get_display()
+		return self.i2s(num)
 
 	def _press_digit(self, digit: int) -> None:
 		self._state = self._state.handle_digit(digit)

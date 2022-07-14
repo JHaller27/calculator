@@ -16,7 +16,7 @@ class BaseState(IState):
 	def handle_operator(self, op: str) -> IState:
 		raise NotImplementedError
 
-	def get_display(self) -> str:
+	def get_display(self) -> int:
 		raise NotImplementedError
 
 
@@ -39,8 +39,8 @@ class InitialState(BaseState):
 
 		return TypingOperator(self.ctx)
 
-	def get_display(self) -> str:
-		return "0"
+	def get_display(self) -> int:
+		return 0
 
 
 class TypingFirstNumber(BaseState):
@@ -54,8 +54,8 @@ class TypingFirstNumber(BaseState):
 		self.ctx.set_operation(op)
 		return TypingOperator(self.ctx)
 
-	def get_display(self) -> str:
-		return self.ctx.i2s(self.ctx.curr_num)
+	def get_display(self) -> int:
+		return self.ctx.curr_num
 
 
 class TypingOperator(BaseState):
@@ -68,8 +68,8 @@ class TypingOperator(BaseState):
 		self.ctx.set_operation(op)
 		return self
 
-	def get_display(self) -> str:
-		return self.ctx.i2s(self.ctx.prev_num)
+	def get_display(self) -> int:
+		return self.ctx.prev_num
 
 
 class TypingSecondNumber(BaseState):
@@ -86,8 +86,8 @@ class TypingSecondNumber(BaseState):
 		self.ctx.set_operation(op)
 		return TypingOperator(self.ctx)
 
-	def get_display(self) -> str:
-		return self.ctx.i2s(self.ctx.curr_num)
+	def get_display(self) -> int:
+		return self.ctx.curr_num
 
 
 class HasResultState(BaseState):
@@ -108,5 +108,5 @@ class HasResultState(BaseState):
 		self.ctx.set_operation(op)
 		return TypingOperator(self.ctx)
 
-	def get_display(self) -> str:
-		return self.ctx.i2s(self.ctx.prev_num)
+	def get_display(self) -> int:
+		return self.ctx.prev_num

@@ -5,5 +5,5 @@ class IState:
 	def handle_operator(self, op: str) -> 'IState':
 		raise NotImplementedError
 
-	def get_display(self) -> str:
+	def get_display(self) -> int:
 		raise NotImplementedError
